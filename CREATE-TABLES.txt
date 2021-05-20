@@ -1,0 +1,326 @@
+-- 테이블 순서는 관계를 고려하여 한 번에 실행해도 에러가 발생하지 않게 정렬되었습니다.
+
+-- UserTB Table Create SQL
+CREATE TABLE UserTB
+(
+    `idx`          INT              NOT NULL    AUTO_INCREMENT, 
+    `createAt`     TIMESTAMP        NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`     TIMESTAMP        NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`       VARCHAR(1)       NOT NULL    DEFAULT 'N' COMMENT 'N: 없는 유저 Y: 존재하는 유저', 
+    `phoneNum`     VARCHAR(15)      NOT NULL, 
+    `usrNickName`  VARCHAR(45)      NOT NULL, 
+    `imgUrl`       TEXT             NULL        COMMENT '프로필 이미지', 
+    `mannerTemp`   DECIMAL(5, 1)    NOT NULL    DEFAULT 36.5 COMMENT '매너온도', 
+    `regionIdx`    INT              NOT NULL    COMMENT '현재 설정 된 지역', 
+    `tradeRate`    DECIMAL(5, 3)    NOT NULL    DEFAULT 0 COMMENT '재거래희망률', 
+    `responeRate`  DECIMAL(5, 3)    NOT NULL    DEFAULT 0 COMMENT '응답률', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE UserTB COMMENT 'RegionTB에서 usrIdx중 leadStatus가 Y인것을 조회하여사용자별 대표지역을 알 수 있다.';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE RegionTB
+(
+    `idx`              INT                NOT NULL    AUTO_INCREMENT COMMENT '지역 코드', 
+    `createAt`         TIMESTAMP          NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`         TIMESTAMP          NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`           VARCHAR(1)         NOT NULL    DEFAULT 'N' COMMENT 'N: 삭제 한 동네 Y: 등록된 동네', 
+    `regionName`       VARCHAR(45)        NULL        COMMENT '지역 명칭', 
+    `usrIdx`           INT                NOT NULL    COMMENT 'UserTB PK', 
+    `authStatus`       VARCHAR(1)         NOT NULL    DEFAULT 'N' COMMENT 'N:인증 안됌  Y:인증 됌', 
+    `authCount`        INT                NOT NULL    DEFAULT 0 COMMENT '인증 횟수, status 변경(N->Y) 시 증가', 
+    `leadStatus`       VARCHAR(1)         NOT NULL    DEFAULT 'N' COMMENT 'N:대표지역 (X) Y: 대표지역(O)', 
+    `noticeStatus`     VARCHAR(1)         NOT NULL    DEFAULT 'Y', 
+    `regionLatitue`    DECIMAL(18, 10)    NOT NULL    DEFAULT 0 COMMENT '지역별 위도', 
+    `regionLongitude`  DECIMAL(18, 10)    NOT NULL    DEFAULT 0 COMMENT '지역별 경도', 
+    `maxRange`         INT                NOT NULL    DEFAULT 0, 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE RegionTB COMMENT '사용자가 등록한 2개의 동네, 등록되어 있는 것중 반드시 대표지역이 있어야 한다.';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE ProductTB
+(
+    `idx`            INT             NOT NULL    AUTO_INCREMENT, 
+    `createAt`       TIMESTAMP       NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`       TIMESTAMP       NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`         VARCHAR(1)      NOT NULL    DEFAULT 'N' COMMENT 'N: 상품 없음 C:거래완료 R: 예약중 Y:거래중', 
+    `pdTitle`        VARCHAR(45)     NULL        COMMENT '상품 제목', 
+    `pdContents`     VARCHAR(300)    NULL        COMMENT '상품 내용', 
+    `regionIdx`      INT             NOT NULL    COMMENT '등록된 상품의 지역', 
+    `sellUsrIdx`     INT             NOT NULL    COMMENT '상품 등록한 useridx/ UserTB PK', 
+    `priceProposal`  VARCHAR(1)      NOT NULL    DEFAULT 'N' COMMENT 'N: 가격제안 불가능 Y: 가격제안 받기', 
+    `pdCategory`     VARCHAR(45)     NULL        COMMENT '카테고리 별 상품 분류', 
+    `price`          INT             NOT NULL    DEFAULT 0 COMMENT '상품 가격', 
+    `hideStatus`     VARCHAR(1)      NOT NULL    DEFAULT 'N' COMMENT '판매완료된 상품 중 N: 숨김X Y: 숨김O', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE ProductTB COMMENT '등록된 상품 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE BoardTB
+(
+    `idx`         INT             NOT NULL    AUTO_INCREMENT, 
+    `createAt`    TIMESTAMP       NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`    TIMESTAMP       NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`      VARCHAR(1)      NOT NULL    DEFAULT 'N', 
+    `bdSubject`   VARCHAR(45)     NOT NULL    COMMENT '게시글 주제', 
+    `usrIdx`      INT             NOT NULL, 
+    `bdContents`  VARCHAR(300)    NOT NULL    COMMENT '게시글 내용', 
+    `regionIdx`   INT             NOT NULL    COMMENT '게시판 등록 지역', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE BoardTB COMMENT '게시판(동네생활) 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE CommentTB
+(
+    `idx`           INT             NOT NULL    AUTO_INCREMENT, 
+    `createAt`      TIMESTAMP       NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`      TIMESTAMP       NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`        VARCHAR(1)      NOT NULL    DEFAULT 'N' COMMENT 'N:  댓글 없음 Y: 댓글 있음', 
+    `contents`      VARCHAR(300)    NOT NULL    COMMENT '댓글내용', 
+    `cmlayer`       INT             NOT NULL    DEFAULT 0 COMMENT '0: 댓글 1:대댓글', 
+    `boardIdx`      INT             NOT NULL    COMMENT '게시판 PK', 
+    `usrIdx`        INT             NOT NULL, 
+    `commentGroup`  INT             NOT NULL    DEFAULT 0 COMMENT '댓글 그룹. 0: 1번째 댓글 1: 2번째 댓글', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE CommentTB COMMENT 'boardidx에 해당하는 댓글과 대댓글';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE ChatRoomTB
+(
+    `idx`           INT           NOT NULL    AUTO_INCREMENT COMMENT '채팅방 고유번호', 
+    `createAt`      TIMESTAMP     NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`      TIMESTAMP     NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `sellerStatus`  VARCHAR(1)    NOT NULL    DEFAULT 'N' COMMENT '판매 유저 기준 N: 삭제 방 Y: 있는 방', 
+    `buyerStatus`   VARCHAR(1)    NOT NULL    DEFAULT 'N' COMMENT '구매 유저 기준 N: 삭제 방 Y 있는 방', 
+    `sellerIdx`     INT           NOT NULL    COMMENT '판매 유저 PK/ UserTB PK', 
+    `buyerIdx`      INT           NOT NULL    COMMENT '구매 유저 PK/ UserTB PK', 
+    `pdIdx`         INT           NOT NULL    COMMENT '상품 PK', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE ChatRoomTB COMMENT '발신일 경우 발신자 값만 넣고, 수신일 경우 수신자 값만 넣는다. 상품 기준으로 채팅 방 생성';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE TopicTB
+(
+    `idx`        INT            NOT NULL    AUTO_INCREMENT, 
+    `createAt`   TIMESTAMP      NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`   TIMESTAMP      NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`     VARCHAR(1)     NOT NULL    DEFAULT 'N' COMMENT 'N: 사라진 주제 Y: 있는 주제', 
+    `topicName`  VARCHAR(10)    NOT NULL    COMMENT '주제명', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE TopicTB COMMENT '관심주제 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE PdimageTB
+(
+    `idx`       INT          NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP    NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP    NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `imgUrl`    TEXT         NOT NULL, 
+    `pdIdx`     INT          NOT NULL    COMMENT '상품 PK', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE PdimageTB COMMENT '상품 사진 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE InterestTopicTB
+(
+    `idx`       INT           NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP     NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP     NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)    NOT NULL    DEFAULT 'N' COMMENT 'N: 없는 주제 R: 체크해제된 주제 Y: 체크된 주제', 
+    `topicIdx`  INT           NOT NULL    COMMENT '주제', 
+    `usrIdx`    INT           NOT NULL, 
+    CONSTRAINT  PRIMARY KEY (idx, updateAt)
+);
+
+ALTER TABLE InterestTopicTB COMMENT '사용자별 관심주제 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE BdSympathyTB
+(
+    `idx`       INT           NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP     NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP     NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)    NOT NULL    DEFAULT 'N' COMMENT 'N: 공감 없음 A~F: 공감 있음', 
+    `usrIdx`    INT           NOT NULL    COMMENT '게시판 공감을 누른 유저idx', 
+    `boardIdx`  INT           NOT NULL    COMMENT '게시판 idx', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE BdSympathyTB COMMENT '게시판 공감 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE CommentSympathyTB
+(
+    `idx`       INT           NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP     NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP     NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)    NOT NULL    DEFAULT 'N' COMMENT 'N: 공감 없음 A~F: 공감 있음', 
+    `cmIdx`     INT           NOT NULL    COMMENT '댓글의 PK', 
+    `usrIdx`    INT           NOT NULL    COMMENT '댓글 공감을 누른 유저idx', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE CommentSympathyTB COMMENT '댓글 공감 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE AttentionTB
+(
+    `idx`       INT           NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP     NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP     NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)    NOT NULL    DEFAULT 'N' COMMENT 'N: 관심 비활성화 Y: 관심 활성화', 
+    `pdIdx`     INT           NOT NULL    COMMENT '상품 PK', 
+    `usrIdx`    INT           NOT NULL    COMMENT '관심을 누른 Useridx/ UserTB PK', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE AttentionTB COMMENT '관심 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE SelectProductTB
+(
+    `idx`       INT           NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP     NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP     NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)    NOT NULL    DEFAULT 'N', 
+    `pdIdx`     INT           NOT NULL    COMMENT '상품 PK', 
+    `usrIdx`    INT           NOT NULL    COMMENT '조회 한 useridx/ UserTB PK', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE SelectProductTB COMMENT '어떤 user가 어떤 상품을 관심가져하는지에 대한 데이터';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE KeyWordEnrollTB
+(
+    `idx`       INT            NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP      NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP      NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)     NOT NULL    DEFAULT 'N' COMMENT 'N: 삭제한 키워드 Y: 등록한 키워드', 
+    `contents`  VARCHAR(45)    NULL        COMMENT '키워드 내용', 
+    `usrIdx`    INT            NOT NULL, 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE KeyWordEnrollTB COMMENT '키워드 등록 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE NoticeTB
+(
+    `idx`             INT             NOT NULL    AUTO_INCREMENT, 
+    `createAt`        TIMESTAMP       NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`        TIMESTAMP       NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`          VARCHAR(1)      NOT NULL    DEFAULT 'N' COMMENT 'N: 공지 없음 Y: 공지 있음', 
+    `noticeTitle`     VARCHAR(45)     NOT NULL    COMMENT '제목', 
+    `noticeContents`  VARCHAR(300)    NOT NULL    COMMENT '내용', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE NoticeTB COMMENT '공지사항 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE RegistSubject
+(
+    `idx`       INT            NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP      NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP      NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)     NOT NULL    DEFAULT 'N' COMMENT 'Y: 등록된 예비 주제 N: 삭제 된 예비주제', 
+    `usrIdx`    INT            NOT NULL, 
+    `contents`  VARCHAR(40)    NOT NULL, 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE RegistSubject COMMENT '없는 주제중 사용자가 원하는 예비 주제를 등록할 수 있다.';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE PurchaseHistoryTB
+(
+    `idx`       INT           NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP     NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP     NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)    NOT NULL    DEFAULT 'N', 
+    `pdIdx`     INT           NOT NULL    COMMENT '상품 PK', 
+    `buyerIdx`  INT           NOT NULL    COMMENT '구매한 User PK/ UserTB PK', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE PurchaseHistoryTB COMMENT 'ProductTB의 status가 C(판매완료)가 됐을 때 내역 테이블에 insert한다.';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE ChatContentsTB
+(
+    `idx`                 INT             NOT NULL    AUTO_INCREMENT, 
+    `createAt`            TIMESTAMP       NOT NULL    DEFAULT current_timestamp, 
+    `updateAt`            TIMESTAMP       NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `contents`            VARCHAR(300)    NOT NULL, 
+    `roomIdx`             INT             NOT NULL    COMMENT '채팅방 고유번호', 
+    `contentCheckStatus`  VARCHAR(45)     NOT NULL    DEFAULT 'N' COMMENT 'N: 읽지 않음 Y: 읽음', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE ChatContentsTB COMMENT '채팅내역 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE RegionLocatioinTB
+(
+    `idx`              INT                NOT NULL    AUTO_INCREMENT, 
+    `createAt`         TIMESTAMP          NULL        DEFAULT current_timestamp, 
+    `updateAt`         TIMESTAMP          NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`           VARCHAR(1)         NULL        DEFAULT 'N' COMMENT 'N: 없는 지역 Y: 존재하는 지역', 
+    `regionLatitue`    DECIMAL(18, 10)    NULL        DEFAULT 0, 
+    `regionLongitude`  DECIMAL(18, 10)    NULL        DEFAULT 0, 
+    `regionIdx`        INT                NULL        DEFAULT 0, 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE RegionLocatioinTB COMMENT '지역별 위도 경도 테이블';
+
+
+-- UserTB Table Create SQL
+CREATE TABLE BoardImgTB
+(
+    `idx`       INT           NOT NULL    AUTO_INCREMENT, 
+    `createAt`  TIMESTAMP     NULL        DEFAULT current_timestamp, 
+    `updateAt`  TIMESTAMP     NULL        DEFAULT current_timestamp on update current_timestamp, 
+    `status`    VARCHAR(1)    NULL        DEFAULT 'N', 
+    `boardIdx`  INT           NULL        DEFAULT 0, 
+    `bdImgUrl`  TEXT          NULL        COMMENT '게시판 이미지', 
+    CONSTRAINT  PRIMARY KEY (idx)
+);
+
+ALTER TABLE BoardImgTB COMMENT '게시판 이미지 테이블';
+
+
