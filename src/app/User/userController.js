@@ -38,6 +38,10 @@ exports.postUsers = async function (req, res) {
 
 // 유저 프로필 조회
 exports.getUserProfilesByIdx = async function (req, res) {
+    let regPhoneNum = /^01([0|1|6|7|8|9]?)-?([0-9]{3,4})-?([0-9]{4})$/;
+    let regPhoneNumResult = regPhoneNum.exec('010-1234-12');
+    console.log(regPhoneNumResult);
+
     const usrIdx = req.verifiedToken.userId;
     if (!usrIdx) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
 
@@ -50,7 +54,6 @@ exports.getUserProfilesByIdx = async function (req, res) {
 exports.getUserDetailProfilesByIdx = async function (req, res) {
     const usrIdx = req.verifiedToken.userId;
     if (!usrIdx) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
-
 
     const selectUserByUserIdx = await userProvider.retrieveUserDetailProfile(usrIdx);
     if(selectUserByUserIdx.length === 0 ) return errResponse(baseResponse.DETAILPROFILE_SELECT_FAIL);
@@ -68,7 +71,6 @@ exports.getUserDetailProfilesByIdx = async function (req, res) {
 
 // 유저 닉네임 조회
 exports.getUsersByIdx = async function (req, res) {
-
     const usrIdx = req.verifiedToken.userId;
 
     if (!usrIdx) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
@@ -100,15 +102,19 @@ exports.logins = async function (req, res) {
 
 // 유저 닉네임 수정
 exports.patchUserNickName = async function (req, res) {
-
-    const userIdx = req.verifiedToken.userId;
+    const userIdFromJWT = req.verifiedToken.userId;
+    const userIdx = req.params.usrIdx;
     const usrNickName = req.body.usrNickName; //변경 할 닉네임
 
-    if (!userIdx) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
-    if (!usrNickName) return res.send(errResponse(baseResponse.USER_NICKNAME_EMPTY));
+    if (userIdFromJWT != userIdx) {
+        res.send(errResponse(baseResponse.USER_ID_NOT_MATCH));
+    } else {
+        if (!userIdx) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+        if (!usrNickName) return res.send(errResponse(baseResponse.USER_NICKNAME_EMPTY));
 
-    const editUserNickName = await userService.editUserNickName(userIdx, usrNickName)
-    return res.send(editUserNickName);
+        const editUserNickName = await userService.editUserNickName(userIdx, usrNickName)
+        return res.send(editUserNickName);
+    }
 
 };
 
@@ -130,14 +136,19 @@ exports.patchDeleteUser = async function (req, res) {
 
 //프로필 이미지 수정
 exports.patchUserImage = async function (req, res) {
-    const userIdx = req.verifiedToken.userId;
+    const userIdFromJWT = req.verifiedToken.userId;
+    const userIdx = req.params.usrIdx;
     const imgUrl = req.body.imgUrl;
-    if (!userIdx || userIdx === "") return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
-    if (imgUrl === "") return res.send(errResponse(baseResponse.SIGNUP_USERIMAGE_EMPTY));
 
-    const editUserImageResult = await userService.editUserImage(imgUrl, userIdx);
-    return res.send(editUserImageResult);
+    if (userIdFromJWT != userIdx) {
+        res.send(errResponse(baseResponse.USER_ID_NOT_MATCH));
+    } else {
+        if (!userIdx || userIdx === "") return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+        if (imgUrl === "") return res.send(errResponse(baseResponse.SIGNUP_USERIMAGE_EMPTY));
 
+        const editUserImageResult = await userService.editUserImage(imgUrl, userIdx);
+        return res.send(editUserImageResult);
+    }
 };
 
 /** JWT 토큰 검증 API

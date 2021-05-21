@@ -9,6 +9,6 @@ module.exports = function(app) {
     // app.post('/app/topics', jwtMiddleware, topic.postTopic);
 
     //유저별 관심주제 변경 API
-    app.patch('/app/topics/status', jwtMiddleware, topic.patchTopic);
+    app.patch('/app/topics/:usrIdx/status', jwtMiddleware, topic.patchTopic);
 
 };

@@ -24,8 +24,8 @@ exports.postTopic = async function (req, res) {
 };
 
 exports.patchTopic = async function (req, res) {
-    const usrIdx = req.verifiedToken.userId;
-    console.log(usrIdx);
+    const userIdFromJWT = req.verifiedToken.userId;
+    const userIdx = req.params.usrIdx;
     //const topicName = req.query.topicName;
     //const status = req.query.status;
     const {status, topicName} = req.body;
@@ -33,13 +33,16 @@ exports.patchTopic = async function (req, res) {
     let regStatus = /^([Y|N])?$/; //status 정규식
     let regStatusResult = regStatus.exec(status);
 
-    if(!usrIdx) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
-    if(!status || status === "") return res.send(errResponse(baseResponse.TOPIC_STATUS_EMPTY));
-    if(regStatusResult === null) return res.send(errResponse(baseResponse.STATUS_FORM_DIFFERENT));
-    if(!topicName || topicName === "") return res.send(errResponse(baseResponse.TOPICNAME_EMPTY));
+    if (userIdFromJWT != userIdx) {
+        res.send(errResponse(baseResponse.USER_ID_NOT_MATCH));
+    } else {
+        if(!userIdx) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+        if(!status || status === "") return res.send(errResponse(baseResponse.TOPIC_STATUS_EMPTY));
+        if(regStatusResult === null) return res.send(errResponse(baseResponse.STATUS_FORM_DIFFERENT));
+        if(!topicName || topicName === "") return res.send(errResponse(baseResponse.TOPICNAME_EMPTY));
 
-    const updateTopicResponse = await topicService.editTopic(status, topicName, usrIdx);
+        const updateTopicResponse = await topicService.editTopic(status, topicName, userIdx);
 
-    return res.send(updateTopicResponse);
-
+        return res.send(updateTopicResponse);
+    }
 };

@@ -18,13 +18,13 @@ module.exports = function(app){
     app.get('/app/users/profiles/detail', jwtMiddleware, user.getUserDetailProfilesByIdx);
 
     // 5. 유저 닉네임 수정 API (+JWT)
-    app.patch('/app/users/nickNames', jwtMiddleware, user.patchUserNickName);
+    app.patch('/app/users/:usrIdx/nickNames', jwtMiddleware, user.patchUserNickName);
 
     // 6. 유저 탈퇴 API (+JWT)
     app.patch('/app/users/:usrIdx/status', jwtMiddleware, user.patchDeleteUser);
 
     // 프로필 이미지 수정
-    app.patch('/app/users/images', jwtMiddleware, user.patchUserImage);
+    app.patch('/app/users/:usrIdx/images', jwtMiddleware, user.patchUserImage);
 
     // TODO: 자동로그인 API (JWT 검증 및 Payload 내뱉기)
     // JWT 검증 API
