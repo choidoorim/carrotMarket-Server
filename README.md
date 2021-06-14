@@ -65,5 +65,6 @@
 📄 package.json
 ```
 ### :bar_chart: ERD 설계
-
+- AqueryTool Link: https://aquerytool.com/aquerymain/index/?rurl=ec4feeac-56e3-4d3e-9a46-9231c7387ab0&
+- AqueryTool Password : no03gy
 
