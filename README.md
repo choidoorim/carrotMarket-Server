@@ -68,3 +68,5 @@
 - AqueryTool Link: https://aquerytool.com/aquerymain/index/?rurl=ec4feeac-56e3-4d3e-9a46-9231c7387ab0&
 - AqueryTool Password : no03gy
 
+![ss](https://user-images.githubusercontent.com/63203480/121928216-e5cc2e80-cd7a-11eb-90d5-8794a02e98b0.PNG)
+
