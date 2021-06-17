@@ -70,3 +70,7 @@
 
 ![ss](https://user-images.githubusercontent.com/63203480/121928216-e5cc2e80-cd7a-11eb-90d5-8794a02e98b0.PNG)
 
+### 아키텍처
+
+![아키텍처](https://user-images.githubusercontent.com/63203480/122328563-df040e00-cf6a-11eb-83d5-284297766523.PNG)
+
