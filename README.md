@@ -67,6 +67,8 @@
 ### :bar_chart: ERD 설계
 - AqueryTool Link: https://aquerytool.com/aquerymain/index/?rurl=ec4feeac-56e3-4d3e-9a46-9231c7387ab0&
 - AqueryTool Password : no03gy
+- 본 ERD 설계는 실제 당근마켓과는 무관합니다.
+- 어떻게 고민하며 ERD 를 설계했는지는 기술블로그에 정리했습니다. [기술블로그](https://choidr.tistory.com/entry/%EB%8B%B9%EA%B7%BC-%EB%A7%88%EC%BC%93-ERD-%EC%84%A4%EA%B3%84?category=1029182)
 
 ![ss](https://user-images.githubusercontent.com/63203480/121928216-e5cc2e80-cd7a-11eb-90d5-8794a02e98b0.PNG)
 
